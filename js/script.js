@@ -1,4 +1,6 @@
 window.onload = function () {
+  // AOS 적용
+  AOS.init();
   // 메뉴기능; //
   const nav = document.querySelector(".nav");
   const btMenu = document.querySelector(".bt-menu");
@@ -67,9 +69,11 @@ window.onload = function () {
   });
 
   //비디오 항목을 체크(video 태그로 파악)
+  // 모든 비디오태그 videos 변수 저장
   let videos = document.querySelectorAll(".swVisual video");
   //    console.log(video);
   // 비디오 시간 체크
+  // 비디오를 재생할 시간을 보관할 배열생성
   let videosTimeArr = [];
   for (let i = 0; i < videos.length; i++) {
     // console.log(videos[i].duration);
@@ -80,16 +84,23 @@ window.onload = function () {
   // 첫번째 비디오 자동 실행
   let videoIndex = 0;
   videos[videoIndex].play();
-  //visual slide
+  // visual slide
+  // 스와이퍼 슬라이드 초기화
   let swVisual = new Swiper(".swVisual", {
     loop: true,
   });
   //슬라이드 변경 이벤트시 처리
   swVisual.on("slideChange", function () {
+    // console.log("슬라이드 교체")
     //진행중인 비디오 멈춤
     videos[videoIndex].pause();
     //다음 화면에 보이는 swiper 슬라이드 번호
     videoIndex = swVisual.realIndex;
+    // 다음 비디오 재생
+    // 처음으로 비디오 플레이헤드 이동
+    // 현재 비디오 재생위치를 나타냄
+    // 이 속성을 조작해서 비디오재생위치를 변경
+    // 다음 슬라이드로 이동할 때마다 비디오를 처음부터 재생하기 위한 부분
     // 현재 보이는 슬라이드에 해당하는 비디오의 재생시간을 처음설정
     videos[videoIndex].currentTime = 0;
     const playPromise = videos[videoIndex].play();
@@ -106,6 +117,7 @@ window.onload = function () {
   //늘어나는 길이를 위한 값(최대 100)
   let barScaleW = 0;
   //타이머를 생성한다.
+  // 비디오 타이머 초기화 및 설정
   let videoTimer;
   function videoReset() {
     //처음에는 0%로 만들려고 한다
@@ -117,8 +129,12 @@ window.onload = function () {
     }
     //활성화 될때 bar 클래스 선택
     let activeBar = bars[videoIndex];
+    // 일단 타이머를 청소한다.
+    // setTimeout : 1번 실행 clearTimeout()
+    // setInterval : 시간마다 연속 실행 clearInterval()
     clearInterval(videoTimer);
-    let videtime = videosTimeArr[videoIndex];
+    // 비디오 플레이시간
+    let videotime = videosTimeArr[videoIndex];
     videoTimer = setInterval(() => {
       barScaleW++;
       activeBar.style.width = `${barScaleW}%`;
@@ -127,12 +143,14 @@ window.onload = function () {
         clearInterval(videoTimer);
         videoReset();
       }
-    }, videtime * 10);
+    }, videotime * 10);
   }
   videoReset();
   const visualControlli = document.querySelectorAll(".visual-control > li");
+  // 클릭 이벤트를 처리하는 이벤트헨들러(약속된 함수)를 작성한다
   visualControlli.forEach((item, index) => {
     item.addEventListener("click", function () {
+      // 클릭을 했을 때 슬라이드 번호로 점프한다.
       videoIndex = index;
       swVisual.slideTo(videoIndex);
     });
